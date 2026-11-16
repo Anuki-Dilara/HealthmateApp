@@ -36,6 +36,7 @@ export default function AddRecordScreen() {
 const [stepsInput, setStepsInput] = useState('');
 const [caloriesInput, setCaloriesInput] = useState('');
 
+const [waterInput, setWaterInput] = useState('');
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.container}>
@@ -93,6 +94,20 @@ const [caloriesInput, setCaloriesInput] = useState('');
             keyboardType="number-pad"
             value={caloriesInput}
             onChangeText={setCaloriesInput}
+        />
+
+        {/* daily water consumption */}
+        <Text style={styles.label}>
+        💧 Water Intake (ml)
+        </Text>
+
+        <TextInput
+            style={styles.input}
+            placeholder="Enter water intake in ml"
+            placeholderTextColor="#9AA49D"
+            keyboardType="number-pad"
+            value={waterInput}
+            onChangeText={setWaterInput}
         />
       </View>
     </SafeAreaView>

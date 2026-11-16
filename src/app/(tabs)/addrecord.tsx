@@ -13,6 +13,8 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddRecordScreen() {
+ 
+  
 
   // new health record uses today's date by default
   const [recordDate, setRecordDate] = useState(new Date());
@@ -32,6 +34,7 @@ export default function AddRecordScreen() {
   }
 // Holds the number of steps entered for health record
 const [stepsInput, setStepsInput] = useState('');
+const [caloriesInput, setCaloriesInput] = useState('');
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -76,6 +79,20 @@ const [stepsInput, setStepsInput] = useState('');
             keyboardType="number-pad"
             value={stepsInput}
             onChangeText={setStepsInput}
+        />
+
+        {/* calories burned in recorded day */}
+        <Text style={styles.label}>
+        🔥 Calories Burned
+        </Text>
+
+        <TextInput
+            style={styles.input}
+            placeholder="Enter calories burned (kcal)"
+            placeholderTextColor="#9AA49D"
+            keyboardType="number-pad"
+            value={caloriesInput}
+            onChangeText={setCaloriesInput}
         />
       </View>
     </SafeAreaView>

@@ -83,4 +83,92 @@ export async function initDatabase() {
     'HealthMate database columns:',
     Array.from(columnNames).join(', ')
   );
+
+
 }
+
+
+export type NewHealthRecord = {
+  recordDate: Date;
+  steps: number;
+  calories: number;
+  waterMl: number;
+};
+
+// Convert the selected date into YYYY-MM-DD format
+function formatRecordDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+// Save one daily health record
+export async function saveHealthRecord(record: NewHealthRecord) {
+  const db = await getHealthMateDatabase();
+
+  // Make sure the selected date is valid.
+  if (
+    !(record.recordDate instanceof Date) ||
+    Number.isNaN(record.recordDate.getTime())
+  ) {
+    throw new Error('Please select a valid record date.');
+  }
+
+  // daily record cannot be created for a future date
+  const recordDate = formatRecordDate(record.recordDate);
+  const todayDate = formatRecordDate(new Date());
+
+  if (recordDate > todayDate) {
+    throw new Error('A future health record cannot be saved.');
+  }
+
+  // measurements must be whole numbers and cannot be negative
+  const measurements = [
+    { name: 'Steps', value: record.steps },
+    { name: 'Calories', value: record.calories },
+    { name: 'Water intake', value: record.waterMl },
+  ];
+
+  for (const measurement of measurements) {
+    if (
+      !Number.isSafeInteger(measurement.value) ||
+      measurement.value < 0
+    ) {
+      throw new Error(
+        `${measurement.name} must be a non-negative whole number.`
+      );
+    }
+  }
+
+  // one daily summary per date
+  // check for an existing record before inserting another one
+  const existingRecord = await db.getFirstAsync<{ id: number }>(
+    'SELECT id FROM health_records WHERE record_date = ?',
+    recordDate
+  );
+
+  if (existingRecord) {
+    throw new Error(
+      'A health record already exists for this date. Please edit the existing record instead.'
+    );
+  }
+
+  const result = await db.runAsync(
+    `INSERT INTO health_records
+      (record_date, steps, calories, water_ml)
+     VALUES (?, ?, ?, ?)`,
+    recordDate,
+    record.steps,
+    record.calories,
+    record.waterMl
+  );
+
+  if (result.changes !== 1) {
+    throw new Error('The health record could not be saved.');
+  }
+
+  return result.lastInsertRowId;
+}
+

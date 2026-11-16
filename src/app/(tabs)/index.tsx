@@ -153,9 +153,24 @@ export default function HomeScreen() {
               todayHealth.steps,
               dailyTargets.steps
             )}
-            cardBackground="#EAF0FF"
-            iconBackground="#D5E3FF"
-            progressColor="#2864DD"
+            cardBackground="#E4F5E9"
+            iconBackground="#C8EAD3"
+            progressColor="#29A66A"
+          />
+          {/* calories card */}
+          <HealthMetricCard
+            title="Calories Burned"
+            emoji="🔥"
+            value={todayHealth.calories.toLocaleString()}
+            unit="kcal"
+            target={`Daily target: ${dailyTargets.calories} kcal`}
+            progress={calculateProgress(
+              todayHealth.calories,
+              dailyTargets.calories
+            )}
+            cardBackground="#FFF0E9"
+            iconBackground="#FFDDCA"
+            progressColor="#EB5A0A"
           />
           {/* water card */}
           <HealthMetricCard
@@ -171,22 +186,6 @@ export default function HomeScreen() {
             cardBackground="#E6F6F8"
             iconBackground="#C9EEF0"
             progressColor="#1295A8"
-          />
-
-          {/* calories card */}
-          <HealthMetricCard
-            title="Calories Burned"
-            emoji="🔥"
-            value={todayHealth.calories.toLocaleString()}
-            unit="kcal"
-            target={`Daily target: ${dailyTargets.calories} kcal`}
-            progress={calculateProgress(
-              todayHealth.calories,
-              dailyTargets.calories
-            )}
-            cardBackground="#FFF0E9"
-            iconBackground="#FFDDCA"
-            progressColor="#EB5A0A"
           />
 
         </View>

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 
 import {
+    Alert,
     Pressable,
     StyleSheet,
     Text,
@@ -13,8 +14,50 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddRecordScreen() {
- 
-  
+// Check the health measurements before allowing the record 
+function validateHealthRecord() {
+
+  if (
+    stepsInput.trim() === '' ||
+    caloriesInput.trim() === '' ||
+    waterInput.trim() === ''
+  ) {
+    setFormError('Please complete all health information.');
+    return false;
+  }
+
+  const recordedSteps = Number(stepsInput);
+  const recordedCalories = Number(caloriesInput);
+  const recordedWater = Number(waterInput);
+
+  // Health measurements must be non negative whole numbers
+  if (
+    !Number.isSafeInteger(recordedSteps) ||
+    recordedSteps < 0
+  ) {
+    setFormError('Please enter a valid whole number for steps.');
+    return false;
+  }
+
+  if (
+    !Number.isSafeInteger(recordedCalories) ||
+    recordedCalories < 0
+  ) {
+    setFormError('Please enter valid calories burned.');
+    return false;
+  }
+
+  if (
+    !Number.isSafeInteger(recordedWater) ||
+    recordedWater < 0
+  ) {
+    setFormError('Please enter valid water intake in ml.');
+    return false;
+  }
+
+  setFormError('');
+  return true;
+}
 
   // new health record uses today's date by default
   const [recordDate, setRecordDate] = useState(new Date());
@@ -34,9 +77,12 @@ export default function AddRecordScreen() {
   }
 // Holds the number of steps entered for health record
 const [stepsInput, setStepsInput] = useState('');
+// Calories burned
 const [caloriesInput, setCaloriesInput] = useState('');
-
+// WaterIntake
 const [waterInput, setWaterInput] = useState('');
+// Validation message for user entered a wrong input
+const [formError, setFormError] = useState('');
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.container}>
@@ -109,6 +155,26 @@ const [waterInput, setWaterInput] = useState('');
             value={waterInput}
             onChangeText={setWaterInput}
         />
+        {formError !== '' && (
+        <Text style={styles.errorText}>
+            ⚠️ {formError}
+        </Text>
+        )}
+        <Pressable
+            style={styles.saveButton}
+            onPress={() => {
+                if (validateHealthRecord()) {
+                Alert.alert(
+                    'Validation successful',
+                    'Your health information is valid. Permanent saving will be added when we connect SQLite.'
+                );
+                }
+            }}
+            >
+            <Text style={styles.saveButtonText}>
+                Check Health Record
+            </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -176,5 +242,26 @@ const styles = StyleSheet.create({
     color: '#35463B',
     },
 
-    
+  saveButton: {
+    backgroundColor: '#176B4D',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 25,
+    },
+
+    saveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    },
+
+    errorText: {
+    color: '#BC3F35',
+    backgroundColor: '#FFF0EF',
+    padding: 12,
+    borderRadius: 10,
+    fontSize: 13,
+    marginTop: 15,
+    },
 });

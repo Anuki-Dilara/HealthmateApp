@@ -5,15 +5,16 @@ import {
   ThemeProvider,
 } from 'expo-router';
 
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
-
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { initDatabase } from '@/database/healthmateDatabase';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  // Prepare the local database when HealthMate starts.
+  // Prepare the local database when HealthMate starts
   useEffect(() => {
     async function prepareHealthMateDatabase() {
       try {
@@ -26,9 +27,8 @@ export default function RootLayout() {
         );
       }
   }
-
-  void prepareHealthMateDatabase();
-}, []);
+    void prepareHealthMateDatabase();
+  }, []);
   return (
     <ThemeProvider
       value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}

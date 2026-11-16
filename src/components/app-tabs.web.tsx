@@ -17,10 +17,10 @@ import {
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
+
 import { ExternalLink } from './external-link';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
-
 export default function AppTabs() {
   return (
     <Tabs>
@@ -99,16 +99,16 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
   },
 
-  brandText: {
-    marginRight: 'auto',
-  },
-
   tabButton: {
     paddingVertical: Spacing.one,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
   },
 
+  brandText: {
+    marginRight: 'auto',
+  },
+  
   externalPressable: {
     flexDirection: 'row',
     justifyContent: 'center',

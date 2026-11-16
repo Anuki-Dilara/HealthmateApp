@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
 
   dashboardSection: {
     paddingHorizontal: 18,
-    paddingTop: 25,
+    paddingTop: 20,
   },
 
   sectionTitle: {
@@ -273,14 +273,14 @@ const styles = StyleSheet.create({
   sectionDescription: {
     fontSize: 13,
     color: '#78857B',
-    marginTop: 6,
-    marginBottom: 18,
+    marginTop: 5,
+    marginBottom: 14,
   },
 
-  metricCard: {
-    borderRadius: 22,
-    padding: 20,
-    marginBottom: 18,
+    metricCard: {
+    borderRadius: 18,
+    padding: 13,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: '#FFFFFF',
   },
@@ -288,24 +288,24 @@ const styles = StyleSheet.create({
   metricHeading: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
-    gap: 13,
+    marginBottom: 8,
+    gap: 10,
   },
 
   emojiBox: {
-    width: 50,
-    height: 50,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   emoji: {
-    fontSize: 26,
-  },
+  fontSize: 21,
+},
 
   metricTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#536175',
   },
@@ -313,27 +313,27 @@ const styles = StyleSheet.create({
   valueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 17,
+    marginBottom: 9,
   },
 
   metricValue: {
-    fontSize: 29,
+    fontSize: 23,
     fontWeight: 'bold',
     color: '#192A50',
   },
 
   metricUnit: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#718092',
-    marginLeft: 7,
+    marginLeft: 6,
   },
 
   progressBackground: {
-    height: 9,
+    height: 7,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 7,
   },
 
   progressFill: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   },
 
   targetText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#718092',
   },
 

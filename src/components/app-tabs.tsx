@@ -1,3 +1,4 @@
+
 import { NativeTabs } from 'expo-router/native-tabs';
 import { useColorScheme } from 'react-native';
 
@@ -11,7 +12,9 @@ export default function AppTabs() {
     <NativeTabs
       backgroundColor={colors.background}
       indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
+      labelStyle={{ selected: { color: colors.text } }}
+    >
+      {/* home dashboard tab */}
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
@@ -20,13 +23,24 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="explore">
-        <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
+      {/* entering health information tab */}
+      <NativeTabs.Trigger name="addrecord">
+        <NativeTabs.Trigger.Label>Add Record</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
-          renderingMode="template"
+          md="add_circle"
+          sf="plus.circle"
+        />
+      </NativeTabs.Trigger>
+
+      {/* viewing saved records tab */}
+      <NativeTabs.Trigger name="records">
+        <NativeTabs.Trigger.Label>Records</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          md="calendar_month"
+          sf="calendar"
         />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
+

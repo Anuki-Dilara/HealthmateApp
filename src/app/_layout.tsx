@@ -19,14 +19,18 @@ export default function RootLayout() {
     async function prepareHealthMateDatabase() {
       try {
         await initDatabase();
-        console.log('HealthMate database initialized successfully.');
+
+        console.log(
+          'HealthMate database initialized successfully.'
+        );
       } catch (error) {
         console.error(
           'HealthMate database initialization failed:',
           error
         );
       }
-  }
+    }
+
     void prepareHealthMateDatabase();
   }, []);
   return (

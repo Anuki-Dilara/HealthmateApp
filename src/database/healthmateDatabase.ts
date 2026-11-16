@@ -13,9 +13,11 @@ async function getHealthMateDatabase() {
   return databaseConnection;
 }
 
+
 export async function initDatabase() {
   const db = await getHealthMateDatabase();
 
+  // Create the table
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
 
@@ -26,8 +28,14 @@ export async function initDatabase() {
       calories INTEGER NOT NULL CHECK (calories >= 0),
       water_ml INTEGER NOT NULL CHECK (water_ml >= 0)
     );
-
-    CREATE INDEX IF NOT EXISTS idx_health_records_date
-    ON health_records(record_date);
   `);
+
+  const existingColumns = await db.getAllAsync<{ name: string }>(
+    'PRAGMA table_info(health_records)'
+  );
+
+  console.log(
+    'HealthMate database columns:',
+    existingColumns.map((column) => column.name).join(', ')
+  );
 }

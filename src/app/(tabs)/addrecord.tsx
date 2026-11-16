@@ -5,6 +5,7 @@ import {
     Pressable,
     StyleSheet,
     Text,
+    TextInput,
     View,
 } from 'react-native';
 
@@ -29,6 +30,8 @@ export default function AddRecordScreen() {
       },
     });
   }
+// Holds the number of steps entered for health record
+const [stepsInput, setStepsInput] = useState('');
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -61,7 +64,19 @@ export default function AddRecordScreen() {
 
           <Text style={styles.calendarIcon}>🗓️</Text>
         </Pressable>
+        {/* daily step count */}
+        <Text style={styles.label}>
+        👟 Steps
+        </Text>
 
+        <TextInput
+            style={styles.input}
+            placeholder="Enter number of steps"
+            placeholderTextColor="#9AA49D"
+            keyboardType="number-pad"
+            value={stepsInput}
+            onChangeText={setStepsInput}
+        />
       </View>
     </SafeAreaView>
   );
@@ -117,4 +132,17 @@ const styles = StyleSheet.create({
   calendarIcon: {
     fontSize: 20,
   },
+
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#DCE9DF',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 15,
+    fontSize: 15,
+    color: '#35463B',
+    },
+
+    
 });

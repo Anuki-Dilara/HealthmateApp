@@ -37,11 +37,18 @@ export default function AppTabs() {
           </TabTrigger>
 
           <TabTrigger
-            name="explore"
-            href="/(tabs)/explore"
+            name="addrecord"
+            href="/(tabs)/addrecord"
             style={styles.tabButton}
           >
-            <ThemedText type="small">Explore</ThemedText>
+            <ThemedText type="small">Add Record</ThemedText>
+          </TabTrigger>
+          <TabTrigger
+            name="records"
+            href="/(tabs)/records"
+            style={styles.tabButton}
+          >
+            <ThemedText type="small">Records</ThemedText>
           </TabTrigger>
         </CustomTabList>
       </TabList>
@@ -108,7 +115,7 @@ const styles = StyleSheet.create({
   brandText: {
     marginRight: 'auto',
   },
-  
+
   externalPressable: {
     flexDirection: 'row',
     justifyContent: 'center',

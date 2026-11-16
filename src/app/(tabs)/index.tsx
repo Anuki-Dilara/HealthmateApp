@@ -157,6 +157,37 @@ export default function HomeScreen() {
             iconBackground="#D5E3FF"
             progressColor="#2864DD"
           />
+          {/* water card */}
+          <HealthMetricCard
+            title="Water Intake"
+            emoji="💧"
+            value={todayHealth.waterMl.toLocaleString()}
+            unit="ml"
+            target={`Daily target: ${dailyTargets.waterMl.toLocaleString()} ml`}
+            progress={calculateProgress(
+              todayHealth.waterMl,
+              dailyTargets.waterMl
+            )}
+            cardBackground="#E6F6F8"
+            iconBackground="#C9EEF0"
+            progressColor="#1295A8"
+          />
+
+          {/* calories card */}
+          <HealthMetricCard
+            title="Calories Burned"
+            emoji="🔥"
+            value={todayHealth.calories.toLocaleString()}
+            unit="kcal"
+            target={`Daily target: ${dailyTargets.calories} kcal`}
+            progress={calculateProgress(
+              todayHealth.calories,
+              dailyTargets.calories
+            )}
+            cardBackground="#FFF0E9"
+            iconBackground="#FFDDCA"
+            progressColor="#EB5A0A"
+          />
 
         </View>
 

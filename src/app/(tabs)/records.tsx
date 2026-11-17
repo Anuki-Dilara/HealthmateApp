@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -215,7 +215,24 @@ export default function RecordsScreen() {
                     Delete Record
                   </Text>
                 </Pressable>
+                <Pressable
+                  style={styles.editButton}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/editrecord',
+                      params: {
+                        id: String(record.id),
+                      },
+                    })
+                  }
+                >
+                  <Text style={styles.editButtonText}>
+                    ✏️ Edit Record
+                  </Text>
+                </Pressable>
               </View>
+
+              
             ))
           )}
         </View>
@@ -375,4 +392,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
+
+  editButton: {
+  backgroundColor: '#E5F2EA',
+  paddingVertical: 11,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginTop: 12,
+},
+
+editButtonText: {
+  color: '#176B4D',
+  fontSize: 14,
+  fontWeight: 'bold',
+},
 });

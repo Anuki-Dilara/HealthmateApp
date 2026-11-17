@@ -97,7 +97,50 @@ export default function EditRecordScreen() {
       },
     });
   }
+// Validate health measurements before updating the record.
+function validateHealthRecord() {
+  if (
+    stepsInput.trim() === '' ||
+    caloriesInput.trim() === '' ||
+    waterInput.trim() === ''
+  ) {
+    setFormError('Please complete all health information.');
+    return false;
+  }
 
+  const recordedSteps = Number(stepsInput);
+  const recordedCalories = Number(caloriesInput);
+  const recordedWater = Number(waterInput);
+
+  //non-negative whole number.
+  if (
+    !Number.isSafeInteger(recordedSteps) ||
+    recordedSteps < 0
+  ) {
+    setFormError('Please enter a valid whole number for steps.');
+    return false;
+  }
+
+ 
+  if (
+    !Number.isSafeInteger(recordedCalories) ||
+    recordedCalories < 0
+  ) {
+    setFormError('Please enter valid calories burned.');
+    return false;
+  }
+
+  if (
+    !Number.isSafeInteger(recordedWater) ||
+    recordedWater < 0
+  ) {
+    setFormError('Please enter valid water intake in ml.');
+    return false;
+  }
+
+  setFormError('');
+  return true;
+}
 if (isLoading) {
   return (
     <SafeAreaView style={styles.screen}>

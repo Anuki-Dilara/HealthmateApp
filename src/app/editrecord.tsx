@@ -79,11 +79,73 @@ export default function EditRecordScreen() {
     };
     }, [id]);
 
+if (isLoading) {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View>
-        <Text>Edit Health Record</Text>
+    <SafeAreaView style={styles.screen}>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#176B4D" />
+
+        <Text style={styles.loadingText}>
+          Loading health record...
+        </Text>
       </View>
     </SafeAreaView>
   );
 }
+
+return (
+  <SafeAreaView style={styles.screen}>
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        ✏️ Edit Health Record
+      </Text>
+
+      {formError !== '' && (
+        <Text style={styles.errorText}>
+          ⚠️ {formError}
+        </Text>
+      )}
+    </View>
+  </SafeAreaView>
+);
+}
+
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: '#F4F7F5',
+  },
+
+  container: {
+    padding: 20,
+  },
+
+  title: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#176B4D',
+    marginBottom: 20,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  loadingText: {
+    fontSize: 14,
+    color: '#758178',
+    marginTop: 12,
+  },
+
+  errorText: {
+    color: '#BC3F35',
+    backgroundColor: '#FFF0EF',
+    padding: 12,
+    borderRadius: 10,
+    fontSize: 13,
+    marginTop: 15,
+  },
+});

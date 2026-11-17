@@ -2,17 +2,17 @@
 import { useState } from 'react';
 
 import {
-    Alert,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { saveHealthRecord } from '../../database/healthmateDatabase';
 export default function AddRecordScreen() {
 // Check the health measurements before allowing the record 
 function validateHealthRecord() {
@@ -29,7 +29,7 @@ function validateHealthRecord() {
   const recordedSteps = Number(stepsInput);
   const recordedCalories = Number(caloriesInput);
   const recordedWater = Number(waterInput);
-
+  const [isSaving, setIsSaving] = useState(false);
   // Health measurements must be non negative whole numbers
   if (
     !Number.isSafeInteger(recordedSteps) ||
@@ -164,16 +164,65 @@ const [formError, setFormError] = useState('');
             style={styles.saveButton}
             onPress={() => {
                 if (validateHealthRecord()) {
-                Alert.alert(
-                    'Validation successful',
-                    'Your health information is valid. Permanent saving will be added when we connect SQLite.'
-                );
+                  
+                  async function handleSaveRecord() {
+                    
+                    if (!validateHealthRecord()) {
+                      return;
+                    }
+
+                    setIsSaving(true);
+
+                    try {
+                     
+                      await saveHealthRecord({
+                        recordDate: recordDate,
+                        steps: Number(stepsInput),
+                        calories: Number(caloriesInput),
+                        waterMl: Number(waterInput),
+                      });
+
+                      Alert.alert(
+                        'Record Saved! 🎉',
+                        'Your daily health record has been saved successfully.'
+                      );
+
+                      setRecordDate(new Date());
+                      setStepsInput('');
+                      setCaloriesInput('');
+                      setWaterInput('');
+
+                    } catch (error) {
+  
+                      const errorMessage =
+                        error instanceof Error
+                          ? error.message
+                          : 'Something went wrong while saving your record.';
+
+                      Alert.alert('Unable to Save Record', errorMessage);
+
+                    } finally {
+                      setIsSaving(false);
+                    }
+                  }
+
                 }
             }}
             >
-            <Text style={styles.saveButtonText}>
-                Check Health Record
-            </Text>
+            
+        <Pressable
+          style={[
+            styles.saveButton,
+            isSaving && styles.buttonDisabled,
+          ]}
+          onPress={handleSaveRecord}
+          disabled={isSaving}
+        >
+          <Text style={styles.saveButtonText}>
+            {isSaving ? 'Saving...' : 'Save Health Record'}
+          </Text>
+        </Pressable>
+
         </Pressable>
       </View>
     </SafeAreaView>
@@ -263,5 +312,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 13,
     marginTop: 15,
+    },
+
+    buttonDisabled: {
+      opacity: 0.6,
     },
 });

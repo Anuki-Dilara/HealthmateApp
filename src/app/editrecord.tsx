@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
+    Alert,
     Pressable,
     StyleSheet,
     Text,
@@ -9,10 +10,11 @@ import {
 } from 'react-native';
 
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-    getHealthRecord
+    getHealthRecord,
+    updateHealthRecord,
 } from '../database/healthmateDatabase';
 export default function EditRecordScreen() {
 
@@ -97,7 +99,7 @@ export default function EditRecordScreen() {
       },
     });
   }
-// Validate health measurements before updating the record.
+// Validate health measurements
 function validateHealthRecord() {
   if (
     stepsInput.trim() === '' ||
@@ -140,6 +142,50 @@ function validateHealthRecord() {
 
   setFormError('');
   return true;
+}
+//save the updated health infor
+async function handleUpdateRecord() {
+  if (!validateHealthRecord()) {
+    return;
+  }
+
+  const recordId = Number(id);
+
+  if (!Number.isSafeInteger(recordId) || recordId <= 0) {
+    setFormError('Invalid health record ID.');
+    return;
+  }
+
+  setIsSaving(true);
+
+  try {
+    await updateHealthRecord(recordId, {
+      recordDate: recordDate,
+      steps: Number(stepsInput),
+      calories: Number(caloriesInput),
+      waterMl: Number(waterInput),
+    });
+
+    Alert.alert(
+      'Record Updated! 🎉',
+      'Your health record has been updated successfully.',
+      [
+        {
+          text: 'OK',
+          onPress: () => router.back(),
+        },
+      ]
+    );
+  } catch (error) {
+    Alert.alert(
+      'Update Failed',
+      error instanceof Error
+        ? error.message
+        : 'Unable to update your health record.'
+    );
+  } finally {
+    setIsSaving(false);
+  }
 }
 if (isLoading) {
   return (

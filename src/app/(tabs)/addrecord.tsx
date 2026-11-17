@@ -29,7 +29,7 @@ function validateHealthRecord() {
   const recordedSteps = Number(stepsInput);
   const recordedCalories = Number(caloriesInput);
   const recordedWater = Number(waterInput);
-  const [isSaving, setIsSaving] = useState(false);
+ 
   // Health measurements must be non negative whole numbers
   if (
     !Number.isSafeInteger(recordedSteps) ||
@@ -81,6 +81,8 @@ const [stepsInput, setStepsInput] = useState('');
 const [caloriesInput, setCaloriesInput] = useState('');
 // WaterIntake
 const [waterInput, setWaterInput] = useState('');
+
+ const [isSaving, setIsSaving] = useState(false);
 // Validation message for user entered a wrong input
 const [formError, setFormError] = useState('');
   return (
@@ -207,6 +209,47 @@ const [formError, setFormError] = useState('');
                   }
 
                 }
+
+                        
+        async function handleSaveRecord() {
+
+          if (!validateHealthRecord()) {
+            return;
+          }
+
+          setIsSaving(true);
+
+          try {
+            await saveHealthRecord({
+              recordDate: recordDate,
+              steps: Number(stepsInput),
+              calories: Number(caloriesInput),
+              waterMl: Number(waterInput),
+            });
+
+            Alert.alert(
+              'Record Saved! 🎉',
+              'Your daily health record has been saved successfully.'
+            );
+
+            setRecordDate(new Date());
+            setStepsInput('');
+            setCaloriesInput('');
+            setWaterInput('');
+
+          } catch (error) {
+            const message =
+              error instanceof Error
+                ? error.message
+                : 'Unable to save your health record.';
+
+            Alert.alert('Saving Failed', message);
+
+          } finally {
+            setIsSaving(false);
+          }
+        }
+
             }}
             >
             

@@ -32,6 +32,20 @@ export default function EditRecordScreen() {
 
   // load the selected health record 
     useEffect(() => {
+        function openCalendar() {
+        DateTimePickerAndroid.open({
+            value: recordDate,
+            mode: 'date',
+            display: 'calendar',
+            maximumDate: new Date(),
+
+            onValueChange: (_event, selectedDate) => {
+            if (selectedDate) {
+                setRecordDate(selectedDate);
+            }
+            },
+        });
+}
     let screenIsActive = true;
 
     async function loadRecord() {
@@ -100,7 +114,25 @@ return (
       <Text style={styles.title}>
         ✏️ Edit Health Record
       </Text>
+       
+        <Text style={styles.label}>
+        📅 Record Date
+        </Text>
 
+        <Pressable
+        style={styles.dateButton}
+        onPress={openCalendar}
+        >
+        <Text style={styles.dateText}>
+            {recordDate.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            })}
+        </Text>
+
+        <Text style={styles.calendarIcon}>🗓️</Text>
+        </Pressable>
       {formError !== '' && (
         <Text style={styles.errorText}>
           ⚠️ {formError}
@@ -148,4 +180,32 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 15,
   },
+
+  label: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#35463B',
+  marginTop: 15,
+  marginBottom: 10,
+},
+
+dateButton: {
+  backgroundColor: '#FFFFFF',
+  borderWidth: 1,
+  borderColor: '#DCE9DF',
+  borderRadius: 12,
+  padding: 16,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+dateText: {
+  fontSize: 15,
+  color: '#35463B',
+},
+
+calendarIcon: {
+  fontSize: 20,
+},
 });

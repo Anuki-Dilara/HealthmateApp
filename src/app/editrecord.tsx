@@ -4,6 +4,7 @@ import {
     Pressable,
     StyleSheet,
     Text,
+    TextInput,
     View
 } from 'react-native';
 
@@ -136,6 +137,19 @@ return (
 
         <Text style={styles.calendarIcon}>🗓️</Text>
         </Pressable>
+        {/* daily step count */}
+        <Text style={styles.label}>
+        👟 Steps
+        </Text>
+
+        <TextInput
+        style={styles.input}
+        placeholder="Enter number of steps"
+        placeholderTextColor="#9AA49D"
+        keyboardType="number-pad"
+        value={stepsInput}
+        onChangeText={setStepsInput}
+        />
       {formError !== '' && (
         <Text style={styles.errorText}>
           ⚠️ {formError}
@@ -210,5 +224,16 @@ dateText: {
 
 calendarIcon: {
   fontSize: 20,
+},
+
+input: {
+  backgroundColor: '#FFFFFF',
+  borderWidth: 1,
+  borderColor: '#DCE9DF',
+  borderRadius: 12,
+  paddingHorizontal: 14,
+  paddingVertical: 15,
+  fontSize: 15,
+  color: '#35463B',
 },
 });

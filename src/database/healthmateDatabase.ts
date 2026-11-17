@@ -94,7 +94,13 @@ export type NewHealthRecord = {
   calories: number;
   waterMl: number;
 };
-
+export type HealthRecord = {
+  id: number;
+  recordDate: string;
+  steps: number;
+  calories: number;
+  waterMl: number;
+};
 // Convert the selected date into YYYY-MM-DD format
 function formatRecordDate(date: Date) {
   const year = date.getFullYear();
@@ -171,4 +177,22 @@ export async function saveHealthRecord(record: NewHealthRecord) {
 
   return result.lastInsertRowId;
 }
+// get all records
+export async function getHealthRecords(): Promise<HealthRecord[]> {
+  const db = await getHealthMateDatabase();
+
+  const savedRecords = await db.getAllAsync<HealthRecord>(
+    `SELECT
+      id,
+      record_date AS recordDate,
+      steps,
+      calories,
+      water_ml AS waterMl
+     FROM health_records
+     ORDER BY record_date DESC, id DESC`
+  );
+
+  return savedRecords;
+}
+
 

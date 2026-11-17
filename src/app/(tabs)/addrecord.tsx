@@ -58,7 +58,44 @@ function validateHealthRecord() {
   setFormError('');
   return true;
 }
+async function handleSaveRecord() {
 
+          if (!validateHealthRecord()) {
+            return;
+          }
+
+          setIsSaving(true);
+
+          try {
+            await saveHealthRecord({
+              recordDate: recordDate,
+              steps: Number(stepsInput),
+              calories: Number(caloriesInput),
+              waterMl: Number(waterInput),
+            });
+
+            Alert.alert(
+              'Record Saved! 🎉',
+              'Your daily health record has been saved successfully.'
+            );
+
+            setRecordDate(new Date());
+            setStepsInput('');
+            setCaloriesInput('');
+            setWaterInput('');
+
+          } catch (error) {
+            const message =
+              error instanceof Error
+                ? error.message
+                : 'Unable to save your health record.';
+
+            Alert.alert('Saving Failed', message);
+
+          } finally {
+            setIsSaving(false);
+          }
+        }
   // new health record uses today's date by default
   const [recordDate, setRecordDate] = useState(new Date());
 
@@ -162,98 +199,8 @@ const [formError, setFormError] = useState('');
             ⚠️ {formError}
         </Text>
         )}
-        <Pressable
-            style={styles.saveButton}
-            onPress={() => {
-                if (validateHealthRecord()) {
-                  
-                  async function handleSaveRecord() {
-                    
-                    if (!validateHealthRecord()) {
-                      return;
-                    }
 
-                    setIsSaving(true);
-
-                    try {
-                     
-                      await saveHealthRecord({
-                        recordDate: recordDate,
-                        steps: Number(stepsInput),
-                        calories: Number(caloriesInput),
-                        waterMl: Number(waterInput),
-                      });
-
-                      Alert.alert(
-                        'Record Saved! 🎉',
-                        'Your daily health record has been saved successfully.'
-                      );
-
-                      setRecordDate(new Date());
-                      setStepsInput('');
-                      setCaloriesInput('');
-                      setWaterInput('');
-
-                    } catch (error) {
-  
-                      const errorMessage =
-                        error instanceof Error
-                          ? error.message
-                          : 'Something went wrong while saving your record.';
-
-                      Alert.alert('Unable to Save Record', errorMessage);
-
-                    } finally {
-                      setIsSaving(false);
-                    }
-                  }
-
-                }
-
-                        
-        async function handleSaveRecord() {
-
-          if (!validateHealthRecord()) {
-            return;
-          }
-
-          setIsSaving(true);
-
-          try {
-            await saveHealthRecord({
-              recordDate: recordDate,
-              steps: Number(stepsInput),
-              calories: Number(caloriesInput),
-              waterMl: Number(waterInput),
-            });
-
-            Alert.alert(
-              'Record Saved! 🎉',
-              'Your daily health record has been saved successfully.'
-            );
-
-            setRecordDate(new Date());
-            setStepsInput('');
-            setCaloriesInput('');
-            setWaterInput('');
-
-          } catch (error) {
-            const message =
-              error instanceof Error
-                ? error.message
-                : 'Unable to save your health record.';
-
-            Alert.alert('Saving Failed', message);
-
-          } finally {
-            setIsSaving(false);
-          }
-        }
-
-            }}
-            >
-            
-        <Pressable
+          <Pressable
           style={[
             styles.saveButton,
             isSaving && styles.buttonDisabled,
@@ -262,11 +209,10 @@ const [formError, setFormError] = useState('');
           disabled={isSaving}
         >
           <Text style={styles.saveButtonText}>
-            {isSaving ? 'Saving...' : 'Save Health Record'}
+            {isSaving ? 'Saving...' : '💚 Save Health Record'}
           </Text>
         </Pressable>
 
-        </Pressable>
       </View>
     </SafeAreaView>
   );

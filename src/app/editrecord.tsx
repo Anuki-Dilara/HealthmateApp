@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
+    Pressable,
     StyleSheet,
     Text,
     View
 } from 'react-native';
 
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
     getHealthRecord
 } from '../database/healthmateDatabase';
-
 export default function EditRecordScreen() {
 
   // get selected id
@@ -32,20 +33,7 @@ export default function EditRecordScreen() {
 
   // load the selected health record 
     useEffect(() => {
-        function openCalendar() {
-        DateTimePickerAndroid.open({
-            value: recordDate,
-            mode: 'date',
-            display: 'calendar',
-            maximumDate: new Date(),
-
-            onValueChange: (_event, selectedDate) => {
-            if (selectedDate) {
-                setRecordDate(selectedDate);
-            }
-            },
-        });
-}
+        
     let screenIsActive = true;
 
     async function loadRecord() {
@@ -86,6 +74,7 @@ export default function EditRecordScreen() {
         }
         }
     }
+    
 
     void loadRecord();
 
@@ -93,6 +82,20 @@ export default function EditRecordScreen() {
         screenIsActive = false;
     };
     }, [id]);
+    function openCalendar() {
+    DateTimePickerAndroid.open({
+      value: recordDate,
+      mode: 'date',
+      display: 'calendar',
+      maximumDate: new Date(),
+
+      onValueChange: (_event, selectedDate) => {
+        if (selectedDate) {
+          setRecordDate(selectedDate);
+        }
+      },
+    });
+  }
 
 if (isLoading) {
   return (

@@ -101,7 +101,7 @@ export type HealthRecord = {
   calories: number;
   waterMl: number;
 };
-// Convert the selected date into YYYY-MM-DD format
+// convert date into YYYY-MM-DD 
 function formatRecordDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -110,7 +110,7 @@ function formatRecordDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-// Save one daily health record
+// Save one daily rec
 export async function saveHealthRecord(record: NewHealthRecord) {
   const db = await getHealthMateDatabase();
 
@@ -196,3 +196,93 @@ export async function getHealthRecords(): Promise<HealthRecord[]> {
 }
 
 
+// Update existing  rec
+export async function updateHealthRecord(
+  id: number,
+  record: NewHealthRecord
+) {
+  const db = await getHealthMateDatabase();
+
+  // validate selected rec date
+  if (
+    !(record.recordDate instanceof Date) ||
+    Number.isNaN(record.recordDate.getTime())
+  ) {
+    throw new Error('Please select a valid record date.');
+  }
+
+  const recordDate = formatRecordDate(record.recordDate);
+  const todayDate = formatRecordDate(new Date());
+
+  if (recordDate > todayDate) {
+    throw new Error('A future health record cannot be saved.');
+  }
+
+  // validate health measurements
+  const measurements = [
+    { name: 'Steps', value: record.steps },
+    { name: 'Calories', value: record.calories },
+    { name: 'Water intake', value: record.waterMl },
+  ];
+
+  for (const measurement of measurements) {
+    if (
+      !Number.isSafeInteger(measurement.value) ||
+      measurement.value < 0
+    ) {
+      throw new Error(
+        `${measurement.name} must be a non-negative whole number.`
+      );
+    }
+  }
+
+  // cant add record same date 
+  const existingRecord = await db.getFirstAsync<{ id: number }>(
+    `SELECT id FROM health_records
+     WHERE record_date = ? AND id != ?`,
+    recordDate,
+    id
+  );
+
+  if (existingRecord) {
+    throw new Error(
+      'Another health record already exists for this date.'
+    );
+  }
+
+  const result = await db.runAsync(
+    `UPDATE health_records
+     SET record_date = ?,
+         steps = ?,
+         calories = ?,
+         water_ml = ?
+     WHERE id = ?`,
+    recordDate,
+    record.steps,
+    record.calories,
+    record.waterMl,
+    id
+  );
+
+  if (result.changes !== 1) {
+    throw new Error('The health record could not be updated.');
+  }
+}
+
+//delete rec
+export async function deleteHealthRecord(id: number) {
+  const db = await getHealthMateDatabase();
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    throw new Error('Invalid health record ID.');
+  }
+
+  const result = await db.runAsync(
+    'DELETE FROM health_records WHERE id = ?',
+    id
+  );
+
+  if (result.changes !== 1) {
+    throw new Error('The health record could not be deleted.');
+  }
+}

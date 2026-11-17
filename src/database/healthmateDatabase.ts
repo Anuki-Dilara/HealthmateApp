@@ -286,3 +286,28 @@ export async function deleteHealthRecord(id: number) {
     throw new Error('The health record could not be deleted.');
   }
 }
+
+// get one health record
+export async function getHealthRecord(
+  id: number
+): Promise<HealthRecord | null> {
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    throw new Error('Invalid health record ID.');
+  }
+
+  const db = await getHealthMateDatabase();
+
+  const record = await db.getFirstAsync<HealthRecord>(
+    `SELECT
+       id,
+       record_date AS recordDate,
+       steps,
+       calories,
+       water_ml AS waterMl
+     FROM health_records
+     WHERE id = ?`,
+    id
+  );
+
+  return record ?? null;
+}

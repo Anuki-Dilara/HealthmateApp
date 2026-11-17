@@ -141,7 +141,7 @@ return (
         <Text style={styles.label}>
         👟 Steps
         </Text>
-
+{/* daily calories burnned */}
         <TextInput
         style={styles.input}
         placeholder="Enter number of steps"
@@ -149,6 +149,32 @@ return (
         keyboardType="number-pad"
         value={stepsInput}
         onChangeText={setStepsInput}
+        />
+        <Text style={styles.label}>
+        🔥 Calories Burned
+        </Text>
+
+        <TextInput
+        style={styles.input}
+        placeholder="Enter calories burned (kcal)"
+        placeholderTextColor="#9AA49D"
+        keyboardType="number-pad"
+        value={caloriesInput}
+        onChangeText={setCaloriesInput}
+        />
+
+        {/* daily water intake */}
+        <Text style={styles.label}>
+        💧 Water Intake (ml)
+        </Text>
+
+        <TextInput
+        style={styles.input}
+        placeholder="Enter water intake in ml"
+        placeholderTextColor="#9AA49D"
+        keyboardType="number-pad"
+        value={waterInput}
+        onChangeText={setWaterInput}
         />
       {formError !== '' && (
         <Text style={styles.errorText}>

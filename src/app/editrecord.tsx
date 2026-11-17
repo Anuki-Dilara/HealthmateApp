@@ -270,6 +270,28 @@ return (
           ⚠️ {formError}
         </Text>
       )}
+      {/*update the existing health record */}
+        <Pressable
+        style={[
+            styles.saveButton,
+            isSaving && styles.buttonDisabled,
+        ]}
+        onPress={handleUpdateRecord}
+        disabled={isSaving}
+        >
+        <Text style={styles.saveButtonText}>
+            {isSaving ? 'Updating...' : '💚 Update Health Record'}
+        </Text>
+        </Pressable>
+        <Pressable
+        style={styles.cancelButton}
+        onPress={() => router.back()}
+        disabled={isSaving}
+        >
+        <Text style={styles.cancelButtonText}>
+            Cancel
+        </Text>
+        </Pressable>
     </View>
   </SafeAreaView>
 );
@@ -350,5 +372,35 @@ input: {
   paddingVertical: 15,
   fontSize: 15,
   color: '#35463B',
+},
+saveButton: {
+  backgroundColor: '#176B4D',
+  paddingVertical: 15,
+  borderRadius: 12,
+  alignItems: 'center',
+  marginTop: 25,
+},
+
+saveButtonText: {
+  color: '#FFFFFF',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+
+buttonDisabled: {
+  opacity: 0.6,
+},
+cancelButton: {
+  backgroundColor: '#E8EFEB',
+  paddingVertical: 14,
+  borderRadius: 12,
+  alignItems: 'center',
+  marginTop: 12,
+},
+
+cancelButtonText: {
+  color: '#35463B',
+  fontSize: 15,
+  fontWeight: 'bold',
 },
 });

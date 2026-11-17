@@ -3,6 +3,8 @@ import { useCallback, useState } from 'react';
 
 import {
   ActivityIndicator,
+  Alert,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +15,7 @@ import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
+  deleteHealthRecord,
   getHealthRecords,
   HealthRecord,
 } from '../../database/healthmateDatabase';
@@ -73,7 +76,42 @@ export default function RecordsScreen() {
       };
     }, [])
   );
+  //delete rec
+  async function handleDeleteRecord(recordId: number) {
+    Alert.alert(
+      'Delete Health Record',
+      'Are you sure you want to delete this health record?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteHealthRecord(recordId);
 
+              // Remove the deleted record from the screen.
+              setHealthRecords((currentRecords) =>
+                currentRecords.filter((record) => record.id !== recordId)
+              );
+
+              Alert.alert('Success', 'Health record deleted successfully.');
+            } catch (error) {
+              Alert.alert(
+                'Delete Failed',
+                error instanceof Error
+                  ? error.message
+                  : 'Unable to delete this health record.'
+              );
+            }
+          },
+        },
+      ]
+    );
+  }
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView
@@ -169,6 +207,14 @@ export default function RecordsScreen() {
                     {record.waterMl.toLocaleString()} ml
                   </Text>
                 </View>
+                <Pressable
+                  style={styles.deleteButton}
+                  onPress={() => handleDeleteRecord(record.id)}
+                >
+                  <Text style={styles.deleteButtonText}>
+                    Delete Record
+                  </Text>
+                </Pressable>
               </View>
             ))
           )}
@@ -315,5 +361,18 @@ const styles = StyleSheet.create({
     color: '#758178',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  deleteButton: {
+    backgroundColor: '#FDECEC',
+    paddingVertical: 11,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+
+  deleteButtonText: {
+    color: '#D64545',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

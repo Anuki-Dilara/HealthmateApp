@@ -167,6 +167,10 @@ export default function HomeScreen() {
     calories: 0,
     waterMl: 0,
   });
+//store week summary
+  const [weeklySummary, setWeeklySummary] = useState(
+  () => calculateWeeklyHealthSummary([], new Date())
+);
   const [hasTodayRecord, setHasTodayRecord] = useState(false);
  const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -181,16 +185,18 @@ export default function HomeScreen() {
         try {
           setLoadError('');
 
-          const todayDate = formatDatabaseDate(new Date());
-
+          const currentDate = new Date();
+          const todayDate = formatDatabaseDate(currentDate);
           const savedRecords = await getHealthRecords();
-
           // find the record matching to today's date
           const todayRecord = savedRecords.find(
             (record) => record.recordDate === todayDate
           );
 
           if (screenIsActive) {
+            setWeeklySummary(
+           calculateWeeklyHealthSummary(savedRecords, currentDate)
+            );
             if (todayRecord) {
                 setTodayHealth({
                   steps: todayRecord.steps,

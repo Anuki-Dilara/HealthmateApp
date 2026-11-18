@@ -8,13 +8,9 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// sample health information
-const todayHealth = {
-  steps: 5280,
-  calories: 320,
-  waterMl: 1250,
-};
-
+import { getHealthRecords } from '@/database/healthmateDatabase';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 // sample daily targets 
 const dailyTargets = {
   steps: 8000,
@@ -33,7 +29,13 @@ function calculateProgress(current: number, target: number) {
     100
   );
 }
+function formatDatabaseDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
 
+  return `${year}-${month}-${day}`;
+}
 type HealthMetricCardProps = {
   title: string;
   emoji: string;
@@ -99,6 +101,67 @@ function HealthMetricCard(props: HealthMetricCardProps) {
 }
 
 export default function HomeScreen() {
+    // store today's actual health info
+  const [todayHealth, setTodayHealth] = useState({
+    steps: 0,
+    calories: 0,
+    waterMl: 0,
+  });
+
+  const [loadError, setLoadError] = useState('');
+
+  //reload today's health information
+  useFocusEffect(
+    useCallback(() => {
+      let screenIsActive = true;
+
+      async function loadTodayHealth() {
+        try {
+          setLoadError('');
+
+          const todayDate = formatDatabaseDate(new Date());
+
+          const savedRecords = await getHealthRecords();
+
+          // find the record matching to today's date
+          const todayRecord = savedRecords.find(
+            (record) => record.recordDate === todayDate
+          );
+
+          if (screenIsActive) {
+            if (todayRecord) {
+              setTodayHealth({
+                steps: todayRecord.steps,
+                calories: todayRecord.calories,
+                waterMl: todayRecord.waterMl,
+              });
+            } else {
+
+              setTodayHealth({
+                steps: 0,
+                calories: 0,
+                waterMl: 0,
+              });
+            }
+          }
+        } catch (error) {
+          if (screenIsActive) {
+            setLoadError(
+              error instanceof Error
+                ? error.message
+                : 'Unable to load today’s health information.'
+            );
+          }
+        }
+      }
+
+      void loadTodayHealth();
+
+      return () => {
+        screenIsActive = false;
+      };
+    }, [])
+  );
   const today = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -141,7 +204,11 @@ export default function HomeScreen() {
           <Text style={styles.sectionDescription}>
             Here is how you are doing today.
           </Text>
-
+          {loadError !== '' && (
+          <Text style={styles.errorText}>
+            ⚠️ {loadError}
+          </Text>
+)}
           {/* steps card */}
           <HealthMetricCard
             title="Steps"
@@ -366,4 +433,13 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     color: '#645B86',
   },
+
+  errorText: {
+  color: '#BC3F35',
+  backgroundColor: '#FFF0EF',
+  padding: 12,
+  borderRadius: 10,
+  fontSize: 13,
+  marginBottom: 12,
+},
 });

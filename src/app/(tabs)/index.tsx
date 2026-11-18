@@ -9,7 +9,7 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getHealthRecords } from '@/database/healthmateDatabase';
+import { getHealthRecords, type HealthRecord } from '@/database/healthmateDatabase';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
@@ -38,6 +38,63 @@ function formatDatabaseDate(date: Date) {
   const day = String(date.getDate()).padStart(2, '0');
 
   return `${year}-${month}-${day}`;
+}
+//calculate health totals and average daily last seven days
+function calculateWeeklyHealthSummary(
+  records: HealthRecord[],
+  today: Date
+) {
+  const firstDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 6
+  );
+
+  const firstDayDate = formatDatabaseDate(firstDay);
+  const todayDate = formatDatabaseDate(today);
+
+
+  const weeklyRecords = records.filter(
+    (record) =>
+      record.recordDate >= firstDayDate &&
+      record.recordDate <= todayDate
+  );
+
+  //calculate weekly totals
+  const totals = weeklyRecords.reduce(
+    (summary, record) => ({
+      steps: summary.steps + record.steps,
+      calories: summary.calories + record.calories,
+      waterMl: summary.waterMl + record.waterMl,
+    }),
+    {
+      steps: 0,
+      calories: 0,
+      waterMl: 0,
+    }
+  );
+
+  const daysTracked = weeklyRecords.length;
+
+  return {
+    totalSteps: totals.steps,
+    totalCalories: totals.calories,
+    totalWaterMl: totals.waterMl,
+    daysTracked,
+
+    // calculate averages 
+    averageSteps: daysTracked > 0
+      ? Math.round(totals.steps / daysTracked)
+      : 0,
+
+    averageCalories: daysTracked > 0
+      ? Math.round(totals.calories / daysTracked)
+      : 0,
+
+    averageWaterMl: daysTracked > 0
+      ? Math.round(totals.waterMl / daysTracked)
+      : 0,
+  };
 }
 type HealthMetricCardProps = {
   title: string;

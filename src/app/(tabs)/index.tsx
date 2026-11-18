@@ -1,5 +1,6 @@
 
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -107,7 +108,7 @@ export default function HomeScreen() {
     calories: 0,
     waterMl: 0,
   });
-
+ const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
 
   //reload today's health information
@@ -116,6 +117,7 @@ export default function HomeScreen() {
       let screenIsActive = true;
 
       async function loadTodayHealth() {
+        setIsLoading(true);
         try {
           setLoadError('');
 
@@ -153,6 +155,11 @@ export default function HomeScreen() {
             );
           }
         }
+        finally {
+        if (screenIsActive) {
+          setIsLoading(false);
+        }
+   }
       }
 
       void loadTodayHealth();
@@ -209,22 +216,31 @@ export default function HomeScreen() {
             ⚠️ {loadError}
           </Text>
 )}
-          {/* steps card */}
+{/* show loading indicator*/}
+{isLoading ? (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color="#176B4D" />
+
+    <Text style={styles.loadingText}>
+      Loading today's health information...
+    </Text>
+  </View>
+      ) : loadError !== '' ? null : (
+        <>
+          {/* Steps card */}
           <HealthMetricCard
             title="Steps"
             emoji="👟"
             value={todayHealth.steps.toLocaleString()}
             unit="steps"
             target={`Daily target: ${dailyTargets.steps.toLocaleString()} steps`}
-            progress={calculateProgress(
-              todayHealth.steps,
-              dailyTargets.steps
-            )}
+            progress={calculateProgress(todayHealth.steps, dailyTargets.steps)}
             cardBackground="#E4F5E9"
             iconBackground="#C8EAD3"
             progressColor="#29A66A"
           />
-          {/* calories card */}
+
+          {/* Calories card */}
           <HealthMetricCard
             title="Calories Burned"
             emoji="🔥"
@@ -239,7 +255,8 @@ export default function HomeScreen() {
             iconBackground="#FFDDCA"
             progressColor="#EB5A0A"
           />
-          {/* water card */}
+
+          {/* Water card */}
           <HealthMetricCard
             title="Water Intake"
             emoji="💧"
@@ -254,6 +271,8 @@ export default function HomeScreen() {
             iconBackground="#C9EEF0"
             progressColor="#1295A8"
           />
+        </>
+      )}
 
         </View>
 
@@ -441,5 +460,15 @@ const styles = StyleSheet.create({
   borderRadius: 10,
   fontSize: 13,
   marginBottom: 12,
+},
+loadingContainer: {
+  alignItems: 'center',
+  padding: 30,
+},
+
+loadingText: {
+  fontSize: 14,
+  color: '#758178',
+  marginTop: 12,
 },
 });

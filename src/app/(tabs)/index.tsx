@@ -12,12 +12,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getHealthRecords } from '@/database/healthmateDatabase';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-// sample daily targets 
+
 const dailyTargets = {
   steps: 8000,
   calories: 500,
   waterMl: 2000,
 };
+
+
 
 // Calculate progress 
 function calculateProgress(current: number, target: number) {
@@ -108,6 +110,7 @@ export default function HomeScreen() {
     calories: 0,
     waterMl: 0,
   });
+  const [hasTodayRecord, setHasTodayRecord] = useState(false);
  const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
 
@@ -132,19 +135,22 @@ export default function HomeScreen() {
 
           if (screenIsActive) {
             if (todayRecord) {
-              setTodayHealth({
-                steps: todayRecord.steps,
-                calories: todayRecord.calories,
-                waterMl: todayRecord.waterMl,
-              });
-            } else {
+                setTodayHealth({
+                  steps: todayRecord.steps,
+                  calories: todayRecord.calories,
+                  waterMl: todayRecord.waterMl,
+                });
 
-              setTodayHealth({
-                steps: 0,
-                calories: 0,
-                waterMl: 0,
-              });
-            }
+                setHasTodayRecord(true);
+              } else {
+                setTodayHealth({
+                  steps: 0,
+                  calories: 0,
+                  waterMl: 0,
+                });
+
+                setHasTodayRecord(false);
+              }
           }
         } catch (error) {
           if (screenIsActive) {
@@ -225,7 +231,20 @@ export default function HomeScreen() {
       Loading today's health information...
     </Text>
   </View>
-      ) : loadError !== '' ? null : (
+) : loadError !== '' ? null : !hasTodayRecord ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyEmoji}>📝</Text>
+
+          <Text style={styles.emptyTitle}>
+            No Health Record Today
+          </Text>
+
+          <Text style={styles.emptyDescription}>
+            You haven't added your health information for today yet.
+            Start recording your daily activities to track your progress.
+          </Text>
+        </View>
+      ) : (
         <>
           {/* Steps card */}
           <HealthMetricCard
@@ -470,5 +489,33 @@ loadingText: {
   fontSize: 14,
   color: '#758178',
   marginTop: 12,
+},
+emptyCard: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 18,
+  padding: 25,
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '#E5EBE7',
+},
+
+emptyEmoji: {
+  fontSize: 42,
+  marginBottom: 15,
+},
+
+emptyTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#35463B',
+  marginBottom: 9,
+  textAlign: 'center',
+},
+
+emptyDescription: {
+  fontSize: 13,
+  color: '#758178',
+  textAlign: 'center',
+  lineHeight: 20,
 },
 });

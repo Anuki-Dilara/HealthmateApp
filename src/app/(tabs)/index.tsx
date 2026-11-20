@@ -1,4 +1,3 @@
-
 import {
   ActivityIndicator,
   ScrollView,
@@ -9,9 +8,9 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getHealthRecords, type HealthRecord } from '@/database/healthmateDatabase';
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useDashboardViewModel } from '@/features/dashboard/viewmodels/dashboardViewModel';
+
+
 
 const dailyTargets = {
   steps: 8000,
@@ -32,70 +31,7 @@ function calculateProgress(current: number, target: number) {
     100
   );
 }
-function formatDatabaseDate(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
 
-  return `${year}-${month}-${day}`;
-}
-//calculate health totals and average daily last seven days
-function calculateWeeklyHealthSummary(
-  records: HealthRecord[],
-  today: Date
-) {
-  const firstDay = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() - 6
-  );
-
-  const firstDayDate = formatDatabaseDate(firstDay);
-  const todayDate = formatDatabaseDate(today);
-
-
-  const weeklyRecords = records.filter(
-    (record) =>
-      record.recordDate >= firstDayDate &&
-      record.recordDate <= todayDate
-  );
-
-  //calculate weekly totals
-  const totals = weeklyRecords.reduce(
-    (summary, record) => ({
-      steps: summary.steps + record.steps,
-      calories: summary.calories + record.calories,
-      waterMl: summary.waterMl + record.waterMl,
-    }),
-    {
-      steps: 0,
-      calories: 0,
-      waterMl: 0,
-    }
-  );
-
-  const daysTracked = weeklyRecords.length;
-
-  return {
-    totalSteps: totals.steps,
-    totalCalories: totals.calories,
-    totalWaterMl: totals.waterMl,
-    daysTracked,
-
-    // calculate averages 
-    averageSteps: daysTracked > 0
-      ? Math.round(totals.steps / daysTracked)
-      : 0,
-
-    averageCalories: daysTracked > 0
-      ? Math.round(totals.calories / daysTracked)
-      : 0,
-
-    averageWaterMl: daysTracked > 0
-      ? Math.round(totals.waterMl / daysTracked)
-      : 0,
-  };
-}
 type HealthMetricCardProps = {
   title: string;
   emoji: string;
@@ -161,83 +97,14 @@ function HealthMetricCard(props: HealthMetricCardProps) {
 }
 
 export default function HomeScreen() {
-    // store today's actual health info
-  const [todayHealth, setTodayHealth] = useState({
-    steps: 0,
-    calories: 0,
-    waterMl: 0,
-  });
-//store week summary
-  const [weeklySummary, setWeeklySummary] = useState(
-  () => calculateWeeklyHealthSummary([], new Date())
-);
-  const [hasTodayRecord, setHasTodayRecord] = useState(false);
- const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
-
+const {
+  todayHealth,
+  hasTodayRecord,
+  weeklySummary,
+  isLoading,
+  loadError,
+} = useDashboardViewModel();
   //reload today's health information
-  useFocusEffect(
-    useCallback(() => {
-      let screenIsActive = true;
-
-      async function loadTodayHealth() {
-        setIsLoading(true);
-        try {
-          setLoadError('');
-
-          const currentDate = new Date();
-          const todayDate = formatDatabaseDate(currentDate);
-          const savedRecords = await getHealthRecords();
-          // find the record matching to today's date
-          const todayRecord = savedRecords.find(
-            (record) => record.recordDate === todayDate
-          );
-
-          if (screenIsActive) {
-            setWeeklySummary(
-           calculateWeeklyHealthSummary(savedRecords, currentDate)
-            );
-            if (todayRecord) {
-                setTodayHealth({
-                  steps: todayRecord.steps,
-                  calories: todayRecord.calories,
-                  waterMl: todayRecord.waterMl,
-                });
-
-                setHasTodayRecord(true);
-              } else {
-                setTodayHealth({
-                  steps: 0,
-                  calories: 0,
-                  waterMl: 0,
-                });
-
-                setHasTodayRecord(false);
-              }
-          }
-        } catch (error) {
-          if (screenIsActive) {
-            setLoadError(
-              error instanceof Error
-                ? error.message
-                : 'Unable to load today’s health information.'
-            );
-          }
-        }
-        finally {
-        if (screenIsActive) {
-          setIsLoading(false);
-        }
-   }
-      }
-
-      void loadTodayHealth();
-
-      return () => {
-        screenIsActive = false;
-      };
-    }, [])
-  );
   const today = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',

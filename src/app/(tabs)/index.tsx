@@ -287,13 +287,13 @@ export default function HomeScreen() {
 )}
 {/* show loading indicator*/}
 {isLoading ? (
-  <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color="#176B4D" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#176B4D" />
 
-    <Text style={styles.loadingText}>
-      Loading today's health information...
-    </Text>
-  </View>
+          <Text style={styles.loadingText}>
+            Loading today's health information...
+          </Text>
+        </View>
 ) : loadError !== '' ? null : !hasTodayRecord ? (
         <View style={styles.emptyCard}>
           <Text style={styles.emptyEmoji}>📝</Text>
@@ -357,7 +357,91 @@ export default function HomeScreen() {
       )}
 
         </View>
+          {/* Weekly health summary eka*/}
+        <View style={styles.weeklySection}>
+          <Text style={styles.sectionTitle}>
+            Weekly Health Summary
+          </Text>
 
+          <Text style={styles.sectionDescription}>
+            Your health activity over the last seven days.
+          </Text>
+
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#176B4D" />
+              <Text style={styles.loadingText}>
+                Loading weekly summary...
+              </Text>
+            </View>
+          ) : loadError !== '' ? null : (
+            <View style={styles.weeklyCard}>
+
+              <Text style={styles.daysTracked}>
+                📅 {weeklySummary.daysTracked} of 7 days tracked
+              </Text>
+
+              {/* Weekly steps */}
+              <View style={styles.weeklyMetricRow}>
+                <View>
+                  <Text style={styles.weeklyMetricTitle}>
+                    👟 Total Steps
+                  </Text>
+                  <Text style={styles.weeklyTotal}>
+                    {weeklySummary.totalSteps.toLocaleString()}
+                  </Text>
+                </View>
+                <View style={styles.averageContainer}>
+                  <Text style={styles.averageLabel}>
+                    Daily Average
+                  </Text>
+                  <Text style={styles.averageValue}>
+                    {weeklySummary.averageSteps.toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+              {/* Weekly calories */}
+              <View style={styles.weeklyMetricRow}>
+                <View>
+                  <Text style={styles.weeklyMetricTitle}>
+                    🔥 Total Calories
+                  </Text>
+                  <Text style={styles.weeklyTotal}>
+                    {weeklySummary.totalCalories.toLocaleString()} kcal
+                  </Text>
+                </View>
+                <View style={styles.averageContainer}>
+                  <Text style={styles.averageLabel}>
+                    Daily Average
+                  </Text>
+                  <Text style={styles.averageValue}>
+                    {weeklySummary.averageCalories.toLocaleString()} kcal
+                  </Text>
+                </View>
+              </View>
+              {/* Weekly water intake */}
+              <View style={styles.weeklyMetricRow}>
+                <View>
+                  <Text style={styles.weeklyMetricTitle}>
+                    💧 Total Water Intake
+                  </Text>
+                  <Text style={styles.weeklyTotal}>
+                    {weeklySummary.totalWaterMl.toLocaleString()} ml
+                  </Text>
+                </View>
+                <View style={styles.averageContainer}>
+                  <Text style={styles.averageLabel}>
+                    Daily Average
+                  </Text>
+                  <Text style={styles.averageValue}>
+                    {weeklySummary.averageWaterMl.toLocaleString()} ml
+                  </Text>
+                </View>
+              </View>
+
+            </View>
+          )}
+        </View>
         {/* daily encouragement */}
         <View style={styles.reminderCard}>
           <Text style={styles.reminderTitle}>
@@ -580,5 +664,63 @@ emptyDescription: {
   color: '#758178',
   textAlign: 'center',
   lineHeight: 20,
+},
+
+weeklySection: {
+  paddingHorizontal: 18,
+  paddingTop: 22,
+},
+
+weeklyCard: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 18,
+  padding: 18,
+  borderWidth: 1,
+  borderColor: '#E5EBE7',
+},
+
+daysTracked: {
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#176B4D',
+  marginBottom: 15,
+},
+
+weeklyMetricRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingVertical: 15,
+  borderTopWidth: 1,
+  borderTopColor: '#EEF1EF',
+},
+
+weeklyMetricTitle: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#536175',
+  marginBottom: 6,
+},
+
+weeklyTotal: {
+  fontSize: 17,
+  fontWeight: 'bold',
+  color: '#26382D',
+},
+
+averageContainer: {
+  alignItems: 'flex-end',
+},
+
+averageLabel: {
+  fontSize: 11,
+  color: '#89948C',
+  marginBottom: 6,
+},
+
+averageValue: {
+  fontSize: 13,
+  fontWeight: 'bold',
+  color: '#176B4D',
 },
 });

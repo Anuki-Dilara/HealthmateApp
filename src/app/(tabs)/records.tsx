@@ -1,6 +1,6 @@
 
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useCallback, useState } from 'react';
-
 import {
   ActivityIndicator,
   Alert,
@@ -32,12 +32,18 @@ function formatRecordDate(recordDate: string) {
     year: 'numeric',
   });
 }
+function formatDatabaseDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
 
+  return `${year}-${month}-${day}`;
+}
 export default function RecordsScreen() {
   const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
-
+const [filterDate, setFilterDate] = useState<Date | null>(null);
   // Reload the records 
   // newly saved records to appear without restarting 
   useFocusEffect(
@@ -76,6 +82,27 @@ export default function RecordsScreen() {
       };
     }, [])
   );
+  //open calender
+  function openDateFilter() {
+  DateTimePickerAndroid.open({
+    value: filterDate ?? new Date(),
+    mode: 'date',
+    display: 'calendar',
+    maximumDate: new Date(),
+
+    onValueChange: (_event, selectedDate) => {
+      if (selectedDate) {
+        setFilterDate(selectedDate);
+      }
+    },
+  });
+}
+const filteredHealthRecords = filterDate
+  ? healthRecords.filter(
+      (record) =>
+        record.recordDate === formatDatabaseDate(filterDate)
+    )
+  : healthRecords;
   //delete rec
   async function handleDeleteRecord(recordId: number) {
     Alert.alert(
@@ -133,7 +160,47 @@ export default function RecordsScreen() {
           <Text style={styles.sectionTitle}>
             📋 Your Daily Records
           </Text>
+{/*filter records*/}
+        <View style={styles.filterContainer}>
 
+          <Text style={styles.filterLabel}>
+            🔎 Filter Records by Date
+          </Text>
+
+          <View style={styles.filterActions}>
+
+            <Pressable
+              style={styles.filterDateButton}
+              onPress={openDateFilter}
+            >
+              <Text style={styles.filterDateText}>
+                {filterDate
+                  ? filterDate.toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : 'Select a date'}
+              </Text>
+
+              <Text style={styles.calendarIcon}>
+                🗓️
+              </Text>
+            </Pressable>
+
+            {filterDate !== null && (
+              <Pressable
+                style={styles.clearFilterButton}
+                onPress={() => setFilterDate(null)}
+              >
+                <Text style={styles.clearFilterText}>
+                  Clear
+                </Text>
+              </Pressable>
+            )}
+
+          </View>
+        </View>
           {/* loading indicator */}
           {isLoading ? (
             <View style={styles.messageContainer}>
@@ -165,8 +232,22 @@ export default function RecordsScreen() {
                 Start by adding your daily health information.
               </Text>
             </View>
+
+            ) : filteredHealthRecords.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyEmoji}>🔍</Text>
+
+              <Text style={styles.emptyTitle}>
+                No Records Found
+              </Text>
+
+              <Text style={styles.emptyDescription}>
+                There are no health records for the selected date.
+                Try selecting another date or clear the filter.
+              </Text>
+            </View>
           ) : (
-            healthRecords.map((record) => (
+            filteredHealthRecords.map((record) => (
               <View key={record.id} style={styles.recordCard}>
                 <View style={styles.recordHeader}>
                   <Text style={styles.recordDate}>
@@ -405,5 +486,59 @@ editButtonText: {
   color: '#176B4D',
   fontSize: 14,
   fontWeight: 'bold',
+},
+filterContainer: {
+  backgroundColor: '#FFFFFF',
+  padding: 15,
+  borderRadius: 14,
+  borderWidth: 1,
+  borderColor: '#E5EBE7',
+  marginBottom: 18,
+},
+
+filterLabel: {
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#35463B',
+  marginBottom: 12,
+},
+
+filterActions: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+},
+
+filterDateButton: {
+  flex: 1,
+  backgroundColor: '#EAF3ED',
+  padding: 13,
+  borderRadius: 10,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+filterDateText: {
+  fontSize: 14,
+  color: '#176B4D',
+  fontWeight: '600',
+},
+
+calendarIcon: {
+  fontSize: 18,
+},
+
+clearFilterButton: {
+  backgroundColor: '#FDECEC',
+  paddingVertical: 13,
+  paddingHorizontal: 15,
+  borderRadius: 10,
+},
+
+clearFilterText: {
+  color: '#D64545',
+  fontWeight: 'bold',
+  fontSize: 13,
 },
 });

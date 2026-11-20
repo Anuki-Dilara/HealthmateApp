@@ -1,90 +1,37 @@
-import { useEffect, useState } from 'react';
+
 import {
-    ActivityIndicator,
-    Alert,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
 } from 'react-native';
 
+import { useEditRecordViewModel } from '@/features/healthrecords/viewmodels/editRecordViewModel';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-    getHealthRecord,
-    updateHealthRecord,
-} from '../database/healthmateDatabase';
 export default function EditRecordScreen() {
 
   // get selected id
   const { id } = useLocalSearchParams<{ id: string }>();
-
-  // store the selected record's info
-  const [recordDate, setRecordDate] = useState(new Date());
-  const [stepsInput, setStepsInput] = useState('');
-  const [caloriesInput, setCaloriesInput] = useState('');
-  const [waterInput, setWaterInput] = useState('');
-
-  // track loading and saving states
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // display validation, loading error
-  const [formError, setFormError] = useState('');
-
-  // load the selected health record 
-    useEffect(() => {
-        
-    let screenIsActive = true;
-
-    async function loadRecord() {
-        try {
-        const recordId = Number(id);
-
-        if (!Number.isSafeInteger(recordId) || recordId <= 0) {
-            throw new Error('Invalid health record ID.');
-        }
-
-        const record = await getHealthRecord(recordId);
-
-        if (!record) {
-            throw new Error('Health record could not be found.');
-        }
-
-        if (screenIsActive) {
-            const [year, month, day] = record.recordDate
-            .split('-')
-            .map(Number);
-
-            setRecordDate(new Date(year, month - 1, day));
-            setStepsInput(String(record.steps));
-            setCaloriesInput(String(record.calories));
-            setWaterInput(String(record.waterMl));
-        }
-        } catch (error) {
-        if (screenIsActive) {
-            setFormError(
-            error instanceof Error
-                ? error.message
-                : 'Unable to load health record.'
-            );
-        }
-        } finally {
-        if (screenIsActive) {
-            setIsLoading(false);
-        }
-        }
-    }
-    
-
-    void loadRecord();
-
-    return () => {
-        screenIsActive = false;
-    };
-    }, [id]);
+  // get editing informationfrom ViewModel.
+  const {
+    recordDate,
+    setRecordDate,
+    stepsInput,
+    setStepsInput,
+    caloriesInput,
+    setCaloriesInput,
+    waterInput,
+    setWaterInput,
+    isLoading,
+    isSaving,
+    formError,
+    updateRecord,
+  } = useEditRecordViewModel(id);
     function openCalendar() {
     DateTimePickerAndroid.open({
       value: recordDate,
@@ -99,73 +46,12 @@ export default function EditRecordScreen() {
       },
     });
   }
-// Validate health measurements
-function validateHealthRecord() {
-  if (
-    stepsInput.trim() === '' ||
-    caloriesInput.trim() === '' ||
-    waterInput.trim() === ''
-  ) {
-    setFormError('Please complete all health information.');
-    return false;
-  }
 
-  const recordedSteps = Number(stepsInput);
-  const recordedCalories = Number(caloriesInput);
-  const recordedWater = Number(waterInput);
-
-  //non-negative whole number.
-  if (
-    !Number.isSafeInteger(recordedSteps) ||
-    recordedSteps < 0
-  ) {
-    setFormError('Please enter a valid whole number for steps.');
-    return false;
-  }
-
- 
-  if (
-    !Number.isSafeInteger(recordedCalories) ||
-    recordedCalories < 0
-  ) {
-    setFormError('Please enter valid calories burned.');
-    return false;
-  }
-
-  if (
-    !Number.isSafeInteger(recordedWater) ||
-    recordedWater < 0
-  ) {
-    setFormError('Please enter valid water intake in ml.');
-    return false;
-  }
-
-  setFormError('');
-  return true;
-}
-//save the updated health infor
+//update health record
 async function handleUpdateRecord() {
-  if (!validateHealthRecord()) {
-    return;
-  }
+  const updated = await updateRecord();
 
-  const recordId = Number(id);
-
-  if (!Number.isSafeInteger(recordId) || recordId <= 0) {
-    setFormError('Invalid health record ID.');
-    return;
-  }
-
-  setIsSaving(true);
-
-  try {
-    await updateHealthRecord(recordId, {
-      recordDate: recordDate,
-      steps: Number(stepsInput),
-      calories: Number(caloriesInput),
-      waterMl: Number(waterInput),
-    });
-
+  if (updated) {
     Alert.alert(
       'Record Updated! 🎉',
       'Your health record has been updated successfully.',
@@ -176,15 +62,6 @@ async function handleUpdateRecord() {
         },
       ]
     );
-  } catch (error) {
-    Alert.alert(
-      'Update Failed',
-      error instanceof Error
-        ? error.message
-        : 'Unable to update your health record.'
-    );
-  } finally {
-    setIsSaving(false);
   }
 }
 if (isLoading) {

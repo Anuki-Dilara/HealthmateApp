@@ -1,6 +1,6 @@
 
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -11,14 +11,10 @@ import {
   View,
 } from 'react-native';
 
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-  deleteHealthRecord,
-  getHealthRecords,
-  HealthRecord,
-} from '../../database/healthmateDatabase';
+import { useRecordsViewModel } from '@/features/healthrecords/viewmodels/useRecordsViewModel';
 
 
 function formatRecordDate(recordDate: string) {
@@ -40,48 +36,17 @@ function formatDatabaseDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 export default function RecordsScreen() {
-  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
-const [filterDate, setFilterDate] = useState<Date | null>(null);
-  // Reload the records 
-  // newly saved records to appear without restarting 
-  useFocusEffect(
-    useCallback(() => {
-      let screenIsActive = true;
+  const {
+    healthRecords,
+    isLoading,
+    loadError,
+    deleteRecord,
+  } = useRecordsViewModel();
 
-      async function loadSavedHealthRecords() {
-        setIsLoading(true);
-        setLoadError('');
+  // Store the date selected for filtering records.
+  const [filterDate, setFilterDate] = useState<Date | null>(null);
 
-        try {
-          const savedRecords = await getHealthRecords();
 
-          if (screenIsActive) {
-            setHealthRecords(savedRecords);
-          }
-        } catch (error) {
-          if (screenIsActive) {
-            setLoadError(
-              error instanceof Error
-                ? error.message
-                : 'Unable to load your health records.'
-            );
-          }
-        } finally {
-          if (screenIsActive) {
-            setIsLoading(false);
-          }
-        }
-      }
-
-      void loadSavedHealthRecords();
-
-      return () => {
-        screenIsActive = false;
-      };
-    }, [])
-  );
   //open calender
   function openDateFilter() {
   DateTimePickerAndroid.open({
@@ -117,15 +82,13 @@ const filteredHealthRecords = filterDate
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
-            try {
-              await deleteHealthRecord(recordId);
+      try {
+        await deleteRecord(recordId);
 
-              // Remove the deleted record from the screen.
-              setHealthRecords((currentRecords) =>
-                currentRecords.filter((record) => record.id !== recordId)
-              );
-
-              Alert.alert('Success', 'Health record deleted successfully.');
+        Alert.alert(
+          'Success',
+          'Health record deleted successfully.'
+        );
             } catch (error) {
               Alert.alert(
                 'Delete Failed',

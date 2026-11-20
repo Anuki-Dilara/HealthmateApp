@@ -1,8 +1,8 @@
 import {
-  DarkTheme,
-  DefaultTheme,
-  Stack,
-  ThemeProvider,
+    DarkTheme,
+    DefaultTheme,
+    Stack,
+    ThemeProvider,
 } from 'expo-router';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
@@ -14,7 +14,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  // Prepare the local database when HealthMate starts
+
   useEffect(() => {
     async function prepareHealthMateDatabase() {
       try {
@@ -39,9 +39,9 @@ export default function RootLayout() {
     >
       <AnimatedSplashOverlay />
 
-      {/* main stack contains the bottom-tab section. */}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="editrecord" />
       </Stack>
     </ThemeProvider>
   );

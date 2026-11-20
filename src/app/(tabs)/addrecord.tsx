@@ -1,6 +1,3 @@
-
-import { useState } from 'react';
-
 import {
   Alert,
   Pressable,
@@ -10,96 +7,28 @@ import {
   View,
 } from 'react-native';
 
+import { useAddRecordViewModel } from '@/features/healthrecords/viewmodels/addRecordViewModel';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { saveHealthRecord } from '../../database/healthmateDatabase';
+// Check the health measurements
 export default function AddRecordScreen() {
-// Check the health measurements before allowing the record 
-function validateHealthRecord() {
 
-  if (
-    stepsInput.trim() === '' ||
-    caloriesInput.trim() === '' ||
-    waterInput.trim() === ''
-  ) {
-    setFormError('Please complete all health information.');
-    return false;
-  }
+  // Get form information
+  const {
+    recordDate,
+    setRecordDate,
+    stepsInput,
+    setStepsInput,
+    caloriesInput,
+    setCaloriesInput,
+    waterInput,
+    setWaterInput,
+    isSaving,
+    formError,
+    saveRecord,
+  } = useAddRecordViewModel();
 
-  const recordedSteps = Number(stepsInput);
-  const recordedCalories = Number(caloriesInput);
-  const recordedWater = Number(waterInput);
- 
-  // Health measurements must be non negative whole numbers
-  if (
-    !Number.isSafeInteger(recordedSteps) ||
-    recordedSteps < 0
-  ) {
-    setFormError('Please enter a valid whole number for steps.');
-    return false;
-  }
-
-  if (
-    !Number.isSafeInteger(recordedCalories) ||
-    recordedCalories < 0
-  ) {
-    setFormError('Please enter valid calories burned.');
-    return false;
-  }
-
-  if (
-    !Number.isSafeInteger(recordedWater) ||
-    recordedWater < 0
-  ) {
-    setFormError('Please enter valid water intake in ml.');
-    return false;
-  }
-
-  setFormError('');
-  return true;
-}
-async function handleSaveRecord() {
-
-          if (!validateHealthRecord()) {
-            return;
-          }
-
-          setIsSaving(true);
-
-          try {
-            await saveHealthRecord({
-              recordDate: recordDate,
-              steps: Number(stepsInput),
-              calories: Number(caloriesInput),
-              waterMl: Number(waterInput),
-            });
-
-            Alert.alert(
-              'Record Saved! 🎉',
-              'Your daily health record has been saved successfully.'
-            );
-
-            setRecordDate(new Date());
-            setStepsInput('');
-            setCaloriesInput('');
-            setWaterInput('');
-
-          } catch (error) {
-            const message =
-              error instanceof Error
-                ? error.message
-                : 'Unable to save your health record.';
-
-            Alert.alert('Saving Failed', message);
-
-          } finally {
-            setIsSaving(false);
-          }
-        }
-  // new health record uses today's date by default
-  const [recordDate, setRecordDate] = useState(new Date());
-
-  // Open the calendar when date field pressed
+  //open the calendar
   function openCalendar() {
     DateTimePickerAndroid.open({
       value: recordDate,
@@ -108,20 +37,24 @@ async function handleSaveRecord() {
       maximumDate: new Date(),
 
       onValueChange: (_event, selectedDate) => {
-        setRecordDate(selectedDate);
+        if (selectedDate) {
+          setRecordDate(selectedDate);
+        }
       },
     });
   }
-// Holds the number of steps entered for health record
-const [stepsInput, setStepsInput] = useState('');
-// Calories burned
-const [caloriesInput, setCaloriesInput] = useState('');
-// WaterIntake
-const [waterInput, setWaterInput] = useState('');
 
- const [isSaving, setIsSaving] = useState(false);
-// Validation message for user entered a wrong input
-const [formError, setFormError] = useState('');
+  //save the record
+  async function handleSaveRecord() {
+    const saved = await saveRecord();
+
+    if (saved) {
+      Alert.alert(
+        'Record Saved! 🎉',
+        'Your daily health record has been saved successfully.'
+      );
+    }
+  }
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.container}>

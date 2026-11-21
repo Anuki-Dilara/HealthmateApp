@@ -90,7 +90,9 @@ export async function initDatabase() {
     'HealthMate database columns:',
     Array.from(columnNames).join(', ')
   );
-
+  if (__DEV__) {
+    await seedDemoHealthRecords();
+  }
 
 }
 
@@ -102,7 +104,42 @@ function formatRecordDate(date: Date) {
 
   return `${year}-${month}-${day}`;
 }
+// Add sample records for testing
+async function seedDemoHealthRecords() {
+  const db = await getHealthMateDatabase();
+  const existingRecords = await db.getFirstAsync<{ total: number }>(
+    'SELECT COUNT(*) AS total FROM health_records'
+  );
+  if ((existingRecords?.total ?? 0) > 0) {
+    return;
+  }
+  const demoRecords = [
+    { daysAgo: 6, steps: 6450, calories: 360, waterMl: 1600 },
+    { daysAgo: 5, steps: 8200, calories: 510, waterMl: 2100 },
+    { daysAgo: 4, steps: 7300, calories: 430, waterMl: 1850 },
+    { daysAgo: 3, steps: 10150, calories: 680, waterMl: 2400 },
+    { daysAgo: 2, steps: 5600, calories: 310, waterMl: 1450 },
+    { daysAgo: 1, steps: 8900, calories: 560, waterMl: 2200 },
+    { daysAgo: 0, steps: 7850, calories: 420, waterMl: 2000 },
+  ];
+  const today = new Date();
+  for (const sample of demoRecords) {
+    const sampleDate = new Date(today);
+    sampleDate.setDate(today.getDate() - sample.daysAgo);
 
+    await db.runAsync(
+      `INSERT INTO health_records
+        (record_date, steps, calories, water_ml)
+       VALUES (?, ?, ?, ?)`,
+      formatRecordDate(sampleDate),
+      sample.steps,
+      sample.calories,
+      sample.waterMl
+    );
+  }
+
+  console.log('HealthMate demo records inserted successfully.');
+}
 // Save one daily rec
 export async function saveHealthRecord(record: NewHealthRecord) {
   const db = await getHealthMateDatabase();

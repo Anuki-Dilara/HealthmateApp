@@ -1,6 +1,13 @@
 
 import * as SQLite from 'expo-sqlite';
-
+import type {
+  HealthRecord,
+  NewHealthRecord,
+} from '../features/healthrecords/models/healthRecords';
+export type {
+  HealthRecord,
+  NewHealthRecord
+} from '../features/healthrecords/models/healthRecords';
 const DATABASE_NAME = 'healthmate.db';
 
 let databaseConnection: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -87,20 +94,6 @@ export async function initDatabase() {
 
 }
 
-
-export type NewHealthRecord = {
-  recordDate: Date;
-  steps: number;
-  calories: number;
-  waterMl: number;
-};
-export type HealthRecord = {
-  id: number;
-  recordDate: string;
-  steps: number;
-  calories: number;
-  waterMl: number;
-};
 // convert date into YYYY-MM-DD 
 function formatRecordDate(date: Date) {
   const year = date.getFullYear();

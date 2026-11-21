@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
-import type { HealthRecord } from '../database/healthmateDatabase';
-
+import type { HealthRecord } from '../features/healthrecords/models/healthRecords';
 
 type HealthMateState = {
   healthRecords: HealthRecord[];

@@ -6,7 +6,7 @@ import {
   updateHealthRecord,
 } from '../../../database/healthmateDatabase';
 
-import type { NewHealthRecord } from '../../../database/healthmateDatabase';
+import type { NewHealthRecord } from '../models/healthRecords';
 
 export const healthRecordRepository = {
 

@@ -1,13 +1,9 @@
 
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-
-import { healthRecordRepository } from '../../healthrecords/repositories/healthRecordRepository';
-
 import { useHealthMateStore } from '../../../store/healthMateStore';
-
-import type { HealthRecord } from '../../../database/healthmateDatabase';
-
+import type { HealthRecord } from '../../healthrecords/models/healthRecords';
+import { healthRecordRepository } from '../../healthrecords/repositories/healthRecordRepository';
 
 function formatDatabaseDate(date: Date) {
   const year = date.getFullYear();
